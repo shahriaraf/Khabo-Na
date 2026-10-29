@@ -1,0 +1,28 @@
+name: khabo_na
+description: Khabo Na - your personal diet, workout and craving coach.
+publish_to: none
+version: 1.1.0+2
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  fl_chart: ^0.69.0
+  flutter_local_notifications: ^18.0.1
+  http: ^1.2.2
+  image_picker: ^1.1.2
+  shared_preferences: ^2.3.2
+  timezone: ^0.9.4
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.1
+  flutter_lints: ^4.0.0
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/icon.png
+  adaptive_icon_background: "#1B5E20"
+  adaptive_icon_foreground: assets/icon/icon_foreground.png
+  remove_alpha_ios: true
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,12 @@
+build/
+.dart_tool/
+.idea/
+*.iml
+.env
+server/.env
+server/node_modules/
+node_modules/
+android/.gradle/
+android/local.properties
+ios/Pods/
+.flutter-plugins*
