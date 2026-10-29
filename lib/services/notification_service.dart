@@ -20,9 +20,25 @@ const nd = NotificationDetails(
 
 Future<void> sched(int id, String t, String b, tz.TZDateTime at) async {
   try {
-    await plugin.zonedSchedule(id, t, b, at, nd, androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
+    await plugin.zonedSchedule(
+      id,
+      t,
+      b,
+      at,
+      nd,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
   } catch (_) {
-    await plugin.zonedSchedule(id, t, b, at, nd, androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle);
+    await plugin.zonedSchedule(
+      id,
+      t,
+      b,
+      at,
+      nd,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
   }
 }
 

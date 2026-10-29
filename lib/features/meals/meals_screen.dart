@@ -13,18 +13,19 @@ class _MealsScreenState extends State<MealsScreen> {
   List get meals => (data['meals'] ??= []) as List;
 
   Future<void> log(Map m) async {
-    final r = await ask(context, 'Portion (1 = same as saved)', ['Portion'], ['1']);
+    final c = context;
+    final r = await ask(c, 'Portion (1 = same as saved)', ['Portion'], ['1']);
     final p = double.tryParse(r?[0] ?? '');
     if (p == null || p <= 0 || !mounted) return;
-    final why = await pickReason(context);
+    final why = await pickReason(c);
     for (final i in m['items']) {
       day()['eat'].add([i[0], ((i[1] as num) * p).round(), ((i[2] as num) * p).round(), why]);
     }
     save();
     scheduleAll();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Meal added to today.')));
-      Navigator.pop(context);
+      ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content: Text('Meal added to today.')));
+      Navigator.pop(c);
     }
   }
 

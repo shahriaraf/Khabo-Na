@@ -26,7 +26,7 @@ class WeeklyChart extends StatelessWidget {
       maxY: vals.fold<double>(b, max) * 1.2,
       barGroups: [for (var i = 0; i < 7; i++) BarChartGroupData(x: i, barRods: [BarChartRodData(toY: vals[i], width: 14, color: vals[i] > b ? Colors.red : Colors.green)])],
       extraLinesData: ExtraLinesData(horizontalLines: [HorizontalLine(y: b, color: Colors.orange, strokeWidth: 2)]),
-      titlesData: _titles((v) => '${days[v.toInt()].day}'),
+      titlesData: _titles((v) => days[v.toInt()].day.toString()),
       gridData: const FlGridData(show: false), borderData: FlBorderData(show: false))));
   }
 }
@@ -40,7 +40,7 @@ class WeightChart extends StatelessWidget {
     if (last.length < 2) return const _Box('Weight (kg)', Center(child: Text('Add at least 2 weight checks to see your line.')));
     return _Box('Weight (kg)', LineChart(LineChartData(
       lineBarsData: [LineChartBarData(spots: [for (var i = 0; i < last.length; i++) FlSpot(i.toDouble(), (last[i][1] as num).toDouble())], color: Colors.green, barWidth: 3)],
-      titlesData: _titles((v) => v == v.roundToDouble() ? '${(last[v.toInt()][0] as String).substring(5)}' : ''),
+      titlesData: _titles((v) => v == v.roundToDouble() ? (last[v.toInt()][0] as String).substring(5) : ''),
       gridData: const FlGridData(show: false), borderData: FlBorderData(show: false))));
   }
 }

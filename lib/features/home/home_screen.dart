@@ -15,25 +15,31 @@ class HomeScreen extends StatefulWidget { const HomeScreen({super.key}); @overri
 class _HomeScreenState extends State<HomeScreen> {
   int tab = 0;
   void done() { save(); scheduleAll(); setState(() {}); }
-  void msg(String s) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
+  Future<void> msg(String s) async {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
+  }
 
   Future<void> addFood() async {
-    final r = await ask(context, 'Add food', ['Food name', 'Calories (kcal)', 'Sugar (grams)']);
+    final c = context;
+    final r = await ask(c, 'Add food', ['Food name', 'Calories (kcal)', 'Sugar (grams)']);
     final k = int.tryParse(r?[1] ?? '');
     if (r == null || k == null) return;
-    final why = await pickReason(context);
+    final why = await pickReason(c);
     day()['eat'].add([r[0], k, int.tryParse(r[2]) ?? 0, why]); done();
   }
 
   Future<void> addBurn() async {
-    final r = await ask(context, 'Workout from Lose Weight app', ['Name', 'Calories burned']);
+    final c = context;
+    final r = await ask(c, 'Workout from Lose Weight app', ['Name', 'Calories burned']);
     final k = int.tryParse(r?[1] ?? '');
     if (r == null || k == null) return;
     day()['burn'].add([r[0], k]); done();
   }
 
   Future<void> addActivity() async {
-    final r = await ask(context, met.keys.join(', '), ['Activity (from list)', 'Minutes']);
+    final c = context;
+    final r = await ask(c, met.keys.join(', '), ['Activity (from list)', 'Minutes']);
     final k = met.keys.firstWhere((e) => e.toLowerCase() == (r?[0] ?? '').toLowerCase(), orElse: () => '');
     final mins = int.tryParse(r?[1] ?? '');
     if (r == null || k.isEmpty || mins == null) { msg('Use an activity name from the list.'); return; }
@@ -51,10 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> review(List items) async {
+    final c = context;
     final ns = [for (final i in items) TextEditingController(text: '${i['name']}')];
     final gs = [for (final i in items) TextEditingController(text: '${(i['grams'] as num).round()}')];
     num kc(int i) => (num.tryParse(gs[i].text) ?? 0) * (items[i]['kcal_per_100g'] as num) / 100;
-    final ok = await showDialog<bool>(context: context, builder: (_) => StatefulBuilder(builder: (c, ss) {
+    final ok = await showDialog<bool>(context: c, builder: (_) => StatefulBuilder(builder: (d, ss) {
       final tot = List.generate(items.length, kc).fold<num>(0, (a, b) => a + b);
       return AlertDialog(
         title: const Text('Check each item'),
@@ -66,10 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(width: 52, child: Text(' ${kc(i).round()}'))]),
           const SizedBox(height: 8), Text('Total: ${tot.round()} kcal'),
         ])),
-        actions: [TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')), FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Save meal'))]);
+        actions: [TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('Cancel')), FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('Save meal'))]);
     }));
     if (ok != true || !mounted) return;
-    final why = await pickReason(context);
+    final why = await pickReason(c);
     final saved = [];
     for (var i = 0; i < items.length; i++) {
       final g = num.tryParse(gs[i].text) ?? 0;
@@ -84,8 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> addRem([int? i]) async {
+    final c = context;
     final list = (data['rem'] ??= []) as List;
-    final r = await ask(context, 'Reminder', ['Messages (separate with |)', 'Every how many minutes?'], i == null ? null : [list[i]['text'], '${list[i]['min']}']);
+    final r = await ask(c, 'Reminder', ['Messages (separate with |)', 'Every how many minutes?'], i == null ? null : [list[i]['text'], '${list[i]['min']}']);
     final m = int.tryParse(r?[1] ?? '');
     if (r == null || r[0].isEmpty || m == null || m < 1) return;
     final item = {'text': r[0], 'min': m, 'on': true};
@@ -94,7 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> settings() async {
-    final r = await ask(context, 'My details', ['Weight kg', 'Height cm', 'Age', 'Goal weight kg', 'Loss per week kg (max 1)', 'My reason for losing weight', 'Quiet from hour (0-23)', 'Quiet until hour (0-23)'],
+    final c = context;
+    final r = await ask(c, 'My details', ['Weight kg', 'Height cm', 'Age', 'Goal weight kg', 'Loss per week kg (max 1)', 'My reason for losing weight', 'Quiet from hour (0-23)', 'Quiet until hour (0-23)'],
       ['${cfg['w']}', '${cfg['h']}', '${cfg['a']}', '${cfg['goal']}', '${cfg['rate']}', cfg['why'], '${cfg['qs']}', '${cfg['qe']}']);
     if (r == null) return;
     cfg['w'] = double.tryParse(r[0]) ?? cfg['w']; cfg['h'] = double.tryParse(r[1]) ?? cfg['h']; cfg['a'] = int.tryParse(r[2]) ?? cfg['a'];
@@ -104,7 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> counter(String k, String label) async {
-    final r = await ask(context, label, ['Number']);
+    final c = context;
+    final r = await ask(c, label, ['Number']);
     final n = num.tryParse(r?[0] ?? '');
     if (n != null) { day()[k] = n; done(); }
   }
@@ -156,7 +166,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> weight() async {
-    final r = await ask(context, 'Weekly check', ['Weight kg', 'Waist cm']);
+    final c = context;
+    final r = await ask(c, 'Weekly check', ['Weight kg', 'Waist cm']);
     final w = double.tryParse(r?[0] ?? '');
     if (w == null) return;
     ((data['wt'] ??= []) as List).add([today(), w, double.tryParse(r![1]) ?? 0]);
@@ -191,7 +202,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView(padding: const EdgeInsets.all(12), children: [
       const Text('Replies for the food trap', style: TextStyle(fontWeight: FontWeight.bold)),
       for (final r in [...defaultReplies, ...mine]) ListTile(dense: true, leading: const Icon(Icons.chat_bubble_outline), title: Text('$r')),
-      TextButton(onPressed: () async { final r = await ask(context, 'My reply', ['Reply']); if (r != null && r[0].isNotEmpty) { mine.add(r[0]); done(); } }, child: const Text('Add my own reply')),
+      TextButton(onPressed: () async {
+        final c = context;
+        final r = await ask(c, 'My reply', ['Reply']);
+        if (r != null && r[0].isNotEmpty) { mine.add(r[0]); done(); }
+      }, child: const Text('Add my own reply')),
       const Divider(),
       const Text('Please remember: calorie numbers are estimates, not absolute truth. A safe loss is about 0.5-1 kg a week. If you often eat very large amounts and feel out of control, please talk to a doctor or dietitian. This is common and treatable.'),
     ]);
